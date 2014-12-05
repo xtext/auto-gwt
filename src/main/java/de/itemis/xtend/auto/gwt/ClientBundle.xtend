@@ -8,6 +8,7 @@ import com.google.gwt.resources.client.ImageResource
 import com.google.gwt.resources.css.DefsCollector
 import com.google.gwt.resources.css.ExtractClassNamesVisitor
 import com.google.gwt.resources.css.GenerateCssAst
+import com.google.gwt.resources.ext.DefaultExtensions
 import java.lang.annotation.ElementType
 import java.lang.annotation.Target
 import java.util.List
@@ -18,9 +19,10 @@ import org.eclipse.xtend.lib.macro.TransformationContext
 import org.eclipse.xtend.lib.macro.TransformationParticipant
 import org.eclipse.xtend.lib.macro.declaration.AnnotationReference
 import org.eclipse.xtend.lib.macro.declaration.InterfaceDeclaration
+import org.eclipse.xtend.lib.macro.declaration.MutableAnnotationTarget
 import org.eclipse.xtend.lib.macro.declaration.MutableInterfaceDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableMethodDeclaration
-import org.eclipse.xtend.lib.macro.file.Path
+import org.eclipse.xtend.lib.macro.declaration.TypeDeclaration
 
 @Target(ElementType.TYPE)
 annotation CssResource {
@@ -41,8 +43,6 @@ annotation ClientBundle {
 class CliendBundleProcessor implements RegisterGlobalsParticipant<InterfaceDeclaration>, TransformationParticipant<MutableInterfaceDeclaration> {
 
 	private static final String INSTANCE = 'INSTANCE'
-
-	private static final String[] EXTENSIONS = #["jpeg", "png", "bmp", "wbmp", "gif"]
 
 	override doRegisterGlobals(List<? extends InterfaceDeclaration> annotatedSourceElements,
 		RegisterGlobalsContext context) {
@@ -82,36 +82,22 @@ class CliendBundleProcessor implements RegisterGlobalsParticipant<InterfaceDecla
 		]
 
 		val clientBundle = findAnnotation(ClientBundle.newTypeReference.type)
-		val sourceFolder = compilationUnit.filePath.sourceFolder
 
 		val cssResources = cssResources
 		for (cssResource : cssResources) {
 			val cssResourceType = findInterface(getCssResourceTypeName(cssResource))
 			cssResourceType.doTransform(clientBundle, cssResource, context)
-
 			addMethod(cssResource.value) [
 				returnType = cssResourceType.newTypeReference
-				addAnnotation(
-					Source.newAnnotationReference [
-						setStringValue("value", cssResource.csses)
-					]
-				)
+				addSourceAnnotation(context, cssResource.csses)
 			]
+			removeAnnotation(cssResource)
 		}
 
-		val imageResource = findAnnotation(ImageResources.newTypeReference.type)
-		if (imageResource != null) {
-			val imageResourceValue = imageResource.value
-			for (imagePath : sourceFolder.append(imageResourceValue).children.filter[image]) {
-				addMethod(imagePath.lastSegment.methodName) [
-					returnType = ImageResource.newTypeReference
-					addAnnotation(
-						Source.newAnnotationReference [
-							setStringValue("value", sourceFolder.relativize(imagePath).toString)
-						]
-					)
-				]
-			}
+		val imageResourcesAnnotation = findAnnotation(ImageResources.newTypeReference.type)
+		if (imageResourcesAnnotation != null) {
+			addResources(imageResourcesAnnotation, ImageResource.findTypeGlobally as TypeDeclaration, context)
+			removeAnnotation(imageResourcesAnnotation)
 		}
 
 		utilType.addMethod('get') [
@@ -130,26 +116,45 @@ class CliendBundleProcessor implements RegisterGlobalsParticipant<InterfaceDecla
 		]
 
 		removeAnnotation(clientBundle)
-		if (imageResource != null) {
-			removeAnnotation(imageResource)
-		}
-		for (cssResource : cssResources) {
-			removeAnnotation(cssResource)
+	}
+
+	protected def void addResources(MutableInterfaceDeclaration it, AnnotationReference resourcesAnnotation,
+		TypeDeclaration resourceType, extension TransformationContext context) {
+		val resourcesPath = resourcesAnnotation.value
+		val sourceFolder = compilationUnit.filePath.sourceFolder
+		val fileExtensions = resourceType.getDefaultFileExtensions(context)
+		val resources = sourceFolder.append(resourcesPath).children.filter [
+			fileExtensions.exists[fileExtension|lastSegment.endsWith(fileExtension)]
+		]
+		for (resource : resources) {
+			addMethod(resource.lastSegment.methodName) [
+				returnType = resourceType.newTypeReference
+				addSourceAnnotation(context, sourceFolder.relativize(resource).toString)
+			]
 		}
 	}
 
-	protected def isImage(Path path) {
-		EXTENSIONS.exists[format|path.fileExtension == format]
+	protected def getDefaultFileExtensions(TypeDeclaration resourceType, extension TransformationContext context) {
+		resourceType.findAnnotation(DefaultExtensions.newTypeReference.type).getStringArrayValue('value')
 	}
 
-	protected def doTransform(MutableInterfaceDeclaration it, AnnotationReference clientBundle, AnnotationReference cssResouce,
-		extension TransformationContext context) {
+	protected def void addSourceAnnotation(MutableAnnotationTarget it, extension TransformationContext context,
+		String ... locations) {
+		addAnnotation(
+			Source.newAnnotationReference [
+				setStringValue("value", locations)
+			]
+		)
+	}
+
+	protected def doTransform(MutableInterfaceDeclaration it, AnnotationReference clientBundle,
+		AnnotationReference cssResouce, extension TransformationContext context) {
 		extendedInterfaces = extendedInterfaces + #[com.google.gwt.resources.client.CssResource.newTypeReference]
 		val sourceFolder = compilationUnit.filePath.sourceFolder
 		val cssStylesheet = GenerateCssAst.exec(
 			new PrintWriterTreeLogger,
-			cssResouce.csses.map [
-				sourceFolder.append(it)
+			cssResouce.csses.map [ css |
+				sourceFolder.append(css)
 			].filter [
 				if (!exists) {
 					cssResouce.addError("File does not exist: " + it)
