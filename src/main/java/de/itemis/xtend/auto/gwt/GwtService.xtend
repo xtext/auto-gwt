@@ -46,7 +46,9 @@ class GwtServiceProcessor extends AbstractClassProcessor {
 		}
 
 		val interfaceType = findInterface(interfaceName)
+		interfaceType.primarySourceElement = primarySourceElement
 		val interfaceAsyncType = findInterface(interfaceAsyncName)
+		interfaceAsyncType.primarySourceElement = primarySourceElement
 
 		interfaceType.extendedInterfaces = interfaceType.extendedInterfaces + #[RemoteService.newTypeReference]
 		val name = interfaceSimpleName.toFirstLower
@@ -60,6 +62,7 @@ class GwtServiceProcessor extends AbstractClassProcessor {
 			interfaceType.addMethod(method.simpleName) [
 				returnType = method.returnType
 				method.parameters.forEach(p|addParameter(p.simpleName, p.type))
+				primarySourceElement = method.primarySourceElement
 			]
 			interfaceAsyncType.addMethod(method.simpleName) [
 				method.parameters.forEach(p|addParameter(p.simpleName, p.type))
@@ -67,6 +70,7 @@ class GwtServiceProcessor extends AbstractClassProcessor {
 					'result',
 					AsyncCallback.newTypeReference(method.returnType.wrapperIfPrimitive)
 				)
+				primarySourceElement = method.primarySourceElement
 			]
 		}
 
