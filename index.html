@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <link href='https://fonts.googleapis.com/css?family=Chivo:900' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <title>Auto-GWT by xtext-dev</title>
+  </head>
+
+  <body>
+    <div id="container">
+      <div class="inner">
+
+        <header>
+          <h1>Auto-GWT</h1>
+          <h2>Boilerplate free GWT programming</h2>
+        </header>
+
+        <section id="downloads" class="clearfix">
+          <a href="https://github.com/xtext-dev/auto-gwt/zipball/master" id="download-zip" class="button"><span>Download .zip</span></a>
+          <a href="https://github.com/xtext-dev/auto-gwt/tarball/master" id="download-tar-gz" class="button"><span>Download .tar.gz</span></a>
+          <a href="https://github.com/xtext-dev/auto-gwt" id="view-on-github" class="button"><span>View on GitHub</span></a>
+        </section>
+
+        <hr>
+
+        <section id="main_content">
+          <h1>
+<a id="auto-gwt" class="anchor" href="#auto-gwt" aria-hidden="true"><span class="octicon octicon-link"></span></a>Auto-GWT</h1>
+
+<p>Auto-GWT is a library for GWT that eleminates all superfluous boilerplate from typical GWT idioms and boosts the tool integration to a new level. It's a library for Xtend (<a href="http://www.xtendlang.org">http://www.xtendlang.org</a>), which is a dense, thin but powerful language over Java. It translates to readable Java source code.</p>
+
+<h1>
+<a id="what-auto-gwt-does-specifically" class="anchor" href="#what-auto-gwt-does-specifically" aria-hidden="true"><span class="octicon octicon-link"></span></a>What Auto-GWT does specifically</h1>
+
+<p>Here are some example of what GWT does for you.</p>
+
+<h1>
+<a id="basic-things-first" class="anchor" href="#basic-things-first" aria-hidden="true"><span class="octicon octicon-link"></span></a>Basic things first</h1>
+
+<p>Xtend in general removes the boilerplate from your Java code base just by using it. Here's just one example of how your typical GWT code could be improved by using Xtend.</p>
+
+<p>Adding a ClickHandler that removes any completed todos.</p>
+
+<p>Java:</p>
+
+<div class="highlight highlight-Java"><pre>clearCompletedButton<span class="pl-k">.</span>addClickHandler(<span class="pl-k">new</span> <span class="pl-stj">ClickHandler</span>() {
+  <span class="pl-st">@Override</span>
+  <span class="pl-s">public</span> <span class="pl-st">void</span> <span class="pl-en">onClick</span>(<span class="pl-stj">ClickEvent</span> <span class="pl-v">event</span>) {
+    <span class="pl-st">List&lt;<span class="pl-stj">Todo</span>&gt;</span> result <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-st">ArrayList&lt;<span class="pl-stj">Todo</span>&gt;</span>();
+    <span class="pl-k">for</span> (<span class="pl-stj">Todo</span> t <span class="pl-k">:</span> getTodos()) {
+      <span class="pl-k">if</span> (<span class="pl-k">!</span>t<span class="pl-k">.</span>isDone()) {
+        result<span class="pl-k">.</span>add(t);
+      }
+    }
+    setTodos(result);
+  }
+});</pre></div>
+
+<p>The same in Xtend:</p>
+
+<div class="highlight highlight-Xtend"><pre>clearCompletedButton<span class="pl-k">.</span>addClickHandler [
+  todos <span class="pl-k">=</span> todos<span class="pl-k">.</span>filter[<span class="pl-k">!</span>done]<span class="pl-k">.</span>toList
+]</pre></div>
+
+<p>Not only much shorter but also much more readable. You glimpse at the code and it is clear what it does.
+And this was only pure Xtend without Auto-GWT. Let's see what Auto-GWT can do.</p>
+
+<h1>
+<a id="automated-uibinder" class="anchor" href="#automated-uibinder" aria-hidden="true"><span class="octicon octicon-link"></span></a>Automated UIBinder</h1>
+
+<p>UiBinder in GWT are a way to bind elements from an XML (html) file to Java code. You give certain elements in the XML a name using the <em>ui::field</em> attribute and then need to redeclare the with the same name and the correct type in your Java class in order to access the programmatically, e.g. to add handlers.</p>
+
+<p>The Auto-GWT <em>@WithUiBinding</em> active annotation does that plumbing for you. You simply annotate your class with the annotation and it will during compilation look up the XML, declare the respective fields automatically and does the rest of the boilerplate for you. </p>
+
+<p>Here's the XML from the <a href="https://github.com/DJCordhose/todomvc-xtend-gwt">example TodoApp</a>.</p>
+
+<div class="highlight highlight-XML"><pre>&lt;!<span class="pl-k">DOCTYPE</span> <span class="pl-v">ui:UiBinder</span> SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent"&gt;
+&lt;<span class="pl-ent">ui</span><span class="pl-ent">:</span><span class="pl-ent">UiBinder</span> <span class="pl-e">xmlns</span><span class="pl-e">:</span><span class="pl-e">ui</span>=<span class="pl-s1"><span class="pl-pds">"</span>urn:ui:com.google.gwt.uibinder<span class="pl-pds">"</span></span>
+    <span class="pl-e">xmlns</span><span class="pl-e">:</span><span class="pl-e">g</span>=<span class="pl-s1"><span class="pl-pds">"</span>urn:import:com.google.gwt.user.client.ui<span class="pl-pds">"</span></span> <span class="pl-e">xmlns</span><span class="pl-e">:</span><span class="pl-e">cv</span>=<span class="pl-s1"><span class="pl-pds">"</span>urn:import:com.google.gwt.user.cellview.client<span class="pl-pds">"</span></span>&gt;
+    &lt;<span class="pl-ent">g</span><span class="pl-ent">:</span><span class="pl-ent">HTMLPanel</span>&gt;
+        &lt;<span class="pl-ent">section</span> <span class="pl-e">id</span>=<span class="pl-s1"><span class="pl-pds">"</span>todoapp<span class="pl-pds">"</span></span>&gt;
+            &lt;<span class="pl-ent">header</span> <span class="pl-e">id</span>=<span class="pl-s1"><span class="pl-pds">"</span>header<span class="pl-pds">"</span></span>&gt;
+                &lt;<span class="pl-ent">h1</span>&gt;todos&lt;/<span class="pl-ent">h1</span>&gt;
+                &lt;<span class="pl-ent">g</span><span class="pl-ent">:</span><span class="pl-ent">TextBox</span> <span class="pl-e">ui</span><span class="pl-e">:</span><span class="pl-e">field</span>=<span class="pl-s1"><span class="pl-pds">"</span>todoText<span class="pl-pds">"</span></span>/&gt;
+            &lt;/<span class="pl-ent">header</span>&gt;
+
+            &lt;<span class="pl-ent">section</span> <span class="pl-e">ui</span><span class="pl-e">:</span><span class="pl-e">field</span>=<span class="pl-s1"><span class="pl-pds">"</span>mainSection<span class="pl-pds">"</span></span>&gt;
+                &lt;<span class="pl-ent">input</span> <span class="pl-e">ui</span><span class="pl-e">:</span><span class="pl-e">field</span>=<span class="pl-s1"><span class="pl-pds">"</span>toggleAll<span class="pl-pds">"</span></span> <span class="pl-e">type</span>=<span class="pl-s1"><span class="pl-pds">"</span>checkbox<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">input</span>&gt;
+                &lt;<span class="pl-ent">label</span> <span class="pl-e">for</span>=<span class="pl-s1"><span class="pl-pds">"</span>toggle-all<span class="pl-pds">"</span></span>&gt;Mark all as complete&lt;/<span class="pl-ent">label</span>&gt;
+                &lt;<span class="pl-ent">ul</span> <span class="pl-e">id</span>=<span class="pl-s1"><span class="pl-pds">"</span>todo-list<span class="pl-pds">"</span></span>&gt;
+                    &lt;<span class="pl-ent">g</span><span class="pl-ent">:</span><span class="pl-ent">FlowPanel</span> <span class="pl-e">ui</span><span class="pl-e">:</span><span class="pl-e">field</span>=<span class="pl-s1"><span class="pl-pds">"</span>todoPanel<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">g</span><span class="pl-ent">:</span><span class="pl-ent">FlowPanel</span>&gt;
+                &lt;/<span class="pl-ent">ul</span>&gt;
+            &lt;/<span class="pl-ent">section</span>&gt;
+
+            &lt;<span class="pl-ent">footer</span> <span class="pl-e">ui</span><span class="pl-e">:</span><span class="pl-e">field</span>=<span class="pl-s1"><span class="pl-pds">"</span>todoStatsContainer<span class="pl-pds">"</span></span>&gt;
+                &lt;<span class="pl-ent">span</span> <span class="pl-e">id</span>=<span class="pl-s1"><span class="pl-pds">"</span>todo-count<span class="pl-pds">"</span></span>&gt;
+                    &lt;<span class="pl-ent">strong</span> <span class="pl-e">class</span>=<span class="pl-s1"><span class="pl-pds">"</span>number<span class="pl-pds">"</span></span> <span class="pl-e">ui</span><span class="pl-e">:</span><span class="pl-e">field</span>=<span class="pl-s1"><span class="pl-pds">"</span>remainingTodosCount<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">strong</span>&gt;
+                    &lt;<span class="pl-ent">span</span> <span class="pl-e">class</span>=<span class="pl-s1"><span class="pl-pds">"</span>word<span class="pl-pds">"</span></span> <span class="pl-e">ui</span><span class="pl-e">:</span><span class="pl-e">field</span>=<span class="pl-s1"><span class="pl-pds">"</span>remainingTodosLabel<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">span</span>&gt;
+                    left.
+                &lt;/<span class="pl-ent">span</span>&gt;
+                &lt;<span class="pl-ent">g</span><span class="pl-ent">:</span><span class="pl-ent">Button</span> <span class="pl-e">ui</span><span class="pl-e">:</span><span class="pl-e">field</span>=<span class="pl-s1"><span class="pl-pds">"</span>clearCompleted<span class="pl-pds">"</span></span>&gt;
+                    Clear completed (&lt;<span class="pl-ent">span</span> <span class="pl-e">class</span>=<span class="pl-s1"><span class="pl-pds">"</span>number-done<span class="pl-pds">"</span></span> <span class="pl-e">ui</span><span class="pl-e">:</span><span class="pl-e">field</span>=<span class="pl-s1"><span class="pl-pds">"</span>clearTodosCount<span class="pl-pds">"</span></span>&gt;&lt;/<span class="pl-ent">span</span>&gt;)
+                &lt;/<span class="pl-ent">g</span><span class="pl-ent">:</span><span class="pl-ent">Button</span>&gt;
+            &lt;/<span class="pl-ent">footer</span>&gt;
+        &lt;/<span class="pl-ent">section</span>&gt;
+    &lt;/<span class="pl-ent">g</span><span class="pl-ent">:</span><span class="pl-ent">HTMLPanel</span>&gt;
+&lt;/<span class="pl-ent">ui</span><span class="pl-ent">:</span><span class="pl-ent">UiBinder</span>&gt;</pre></div>
+
+<p>And here's an excerpt from the class that adds the handlers</p>
+
+<div class="highlight highlight-Xtend"><pre>@WithUiBinding <span class="pl-s">class</span> <span class="pl-en">TodoView</span> {
+   .<span class="pl-k">.</span>.
+  <span class="pl-en">def</span> <span class="pl-st">void</span> <span class="pl-en">clearTodoText</span>() {
+    <span class="pl-c">// accesses the automatically added todoText field.</span>
+        todoText<span class="pl-k">.</span>text <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span><span class="pl-pds">'</span></span>
+    }
+   .<span class="pl-k">.</span>.
+}</pre></div>
+
+<h1>
+<a id="programmatic-uis" class="anchor" href="#programmatic-uis" aria-hidden="true"><span class="octicon octicon-link"></span></a>Programmatic UIs</h1>
+
+<p>An alternative to UI definition via XML is to program them in Java. Here's an example of how that usually looks like:</p>
+
+<p>Java:</p>
+
+<div class="highlight highlight-Java"><pre><span class="pl-stj">FlowPanel</span> view <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">FlowPanel</span>();
+view<span class="pl-k">.</span>setStyleName(<span class="pl-s1"><span class="pl-pds">"</span>view<span class="pl-pds">"</span></span>);
+<span class="pl-c1">...</span>
+<span class="pl-stj">Label</span> label <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">Label</span>();
+label<span class="pl-k">.</span>setText(todo<span class="pl-k">.</span>getText());
+view<span class="pl-k">.</span>add(label);
+<span class="pl-stj">Button</span> button <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-stj">Button</span>();
+button<span class="pl-k">.</span>setStyleName(<span class="pl-s1"><span class="pl-pds">"</span>destroy<span class="pl-pds">"</span></span>);
+view<span class="pl-k">.</span>add(button);
+button<span class="pl-k">.</span>addClickHandler(<span class="pl-k">new</span> <span class="pl-stj">ClickHandler</span>() {
+    <span class="pl-st">@Override</span>
+    <span class="pl-s">public</span> <span class="pl-st">void</span> <span class="pl-en">onClick</span>(<span class="pl-stj">ClickEvent</span> <span class="pl-v">event</span>) {
+         deleteTodo(todo);  
+    }
+});</pre></div>
+
+<p>Not very readable, as the imperative code doesn't reflect the UI structure a tiny bit. 
+With Auto-GWT you can do much better:</p>
+
+<p>Xtend:</p>
+
+<div class="highlight highlight-Xtend"><pre>flowPanel [
+  styleName <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>view<span class="pl-pds">'</span></span>
+  .<span class="pl-k">.</span>.
+  label [
+    text <span class="pl-k">=</span> todo<span class="pl-k">.</span>text
+  ]
+  button [
+    styleName <span class="pl-k">=</span> <span class="pl-s1"><span class="pl-pds">'</span>destroy<span class="pl-pds">'</span></span>
+    onClick [
+      deleteTodo(todo)
+    ]
+  ]
+]</pre></div>
+
+<p>This is really the same thing but written in Xtend and using Auto-GWT's <em>UiBuilder</em> API. And note that this is fully statically-typed and the IDE gives you all the things you have in Java.</p>
+
+<h1>
+<a id="automated-gwt-rpc" class="anchor" href="#automated-gwt-rpc" aria-hidden="true"><span class="octicon octicon-link"></span></a>Automated GWT RPC</h1>
+
+<p>GWT comes with easy to use support for calling server side services from the browser (see <a href="http://www.gwtproject.org/doc/latest/tutorial/RPC.html">GWT documentation</a>). You basically need to declare a service interface for the server side, the corresponding implementation and an asynchronous client side variant of the interface. Auto-GWT can imporve on this with the <em>@GWTService</em> active annotation. You only need to define the implementation, like so:</p>
+
+<div class="highlight highlight-Xtend"><pre>@GwtService <span class="pl-s">class</span> <span class="pl-en">TodoServiceImpl</span> {
+
+    <span class="pl-en">override</span> <span class="pl-st">List&lt;<span class="pl-en">Todo</span>&gt;</span> <span class="pl-en">load</span>(<span class="pl-en">String</span> <span class="pl-v">name</span>) {
+        memcacheService<span class="pl-k">.</span>get(name) as <span class="pl-st">List&lt;<span class="pl-en">Todo</span>&gt;</span>
+    }
+
+    <span class="pl-en">override</span> <span class="pl-st">void</span> <span class="pl-en">save</span>(<span class="pl-st">List&lt;<span class="pl-en">Todo</span>&gt;</span> <span class="pl-v">todos</span>, <span class="pl-en">String</span> <span class="pl-v">name</span>) {
+        memcacheService<span class="pl-k">.</span>put(name, todos)
+    }
+
+}</pre></div>
+
+<p>and Auto-GWT will derive the whole pattern needed by GWT from that. Again the big benefit is not only less code to type, read and maintain, but that the IDE and the compiler are fully aware of the expansion. Just try doing a CallHierarchy in Eclipse on a client side call of an async service method. It will go seemlessly to the server side code.</p>
+
+<h1>
+<a id="overlaytypes---working-with-json" class="anchor" href="#overlaytypes---working-with-json" aria-hidden="true"><span class="octicon octicon-link"></span></a>OverlayTypes - Working with JSON</h1>
+
+<p>Imagine you want to call some arbitrary REST service that responses with JSON data. Usually there is a decsription on that website, sporting an example of the JSON data. But how do you access it from within client side GWT? OverlayTypes are a good solution as they are just thin facades over the real javascript objects. But writing them by hand and for a given example JSON tree is tedious and error prone. With Auto-GWT you can use <em>@OverlayTypeByExample</em> and just past the JSON data as an annotation value. The compiler will create proper GWT OverlayTypes from that. It will even create nested types for nested data structures.</p>
+
+<p>Here's an example:</p>
+
+<div class="highlight highlight-Xtend"><pre>@<span class="pl-en">OverlayTypeByExample</span>(<span class="pl-s1"><span class="pl-pds">'</span></span>
+<span class="pl-s1">  {</span>
+<span class="pl-s1">    "name" : "GWT",</span>
+<span class="pl-s1">    "license" : "Apache License 2.0",</span>
+<span class="pl-s1">    "committers" : [</span>
+<span class="pl-s1">      {</span>
+<span class="pl-s1">        "firstName" : "Ray",</span>
+<span class="pl-s1">        "name" : "Cromwell",</span>
+<span class="pl-s1">        "company" : "Google"</span>
+<span class="pl-s1">      }</span>
+<span class="pl-s1">      //one example per array is enough ;-)</span>
+<span class="pl-s1">    ]</span>
+<span class="pl-s1">  }</span>
+<span class="pl-s1"><span class="pl-pds">'</span></span>)
+<span class="pl-s">class</span> <span class="pl-en">OpenSourceProject</span> {}</pre></div>
+
+<p>The <em>@OverlayTypeByExample</em> will create teh following Java code from that:</p>
+
+<p>Generated Java:</p>
+
+<div class="highlight highlight-Java"><pre><span class="pl-s">public</span> <span class="pl-s">class</span> <span class="pl-en">OpenSourceProject</span> <span class="pl-s">extends</span> <span class="pl-e">JavaScriptObject</span> {
+  <span class="pl-s">public</span> <span class="pl-s">static</span> <span class="pl-s">class</span> <span class="pl-en">Committer</span> <span class="pl-s">extends</span> <span class="pl-e">JavaScriptObject</span> {
+    <span class="pl-s">protected</span> <span class="pl-en">Committer</span>() {}
+    <span class="pl-s">public</span> <span class="pl-s">final</span> <span class="pl-s">native</span> <span class="pl-stj">String</span> <span class="pl-en">getFirstName</span>() <span class="pl-c">/*-{ return this.FirstName; }-*/</span>;
+    <span class="pl-s">public</span> <span class="pl-s">final</span> <span class="pl-s">native</span> <span class="pl-stj">String</span> <span class="pl-en">getName</span>() <span class="pl-c">/*-{ return this.Name; }-*/</span>;
+    <span class="pl-s">public</span> <span class="pl-s">final</span> <span class="pl-s">native</span> <span class="pl-stj">String</span> <span class="pl-en">getCompany</span>() <span class="pl-c">/*-{ return this.Company; }-*/</span>;
+  }
+
+  <span class="pl-s">protected</span> <span class="pl-en">OpenSourceProject</span>() {}
+  <span class="pl-s">public</span> <span class="pl-s">final</span> <span class="pl-s">native</span> <span class="pl-stj">String</span> <span class="pl-en">getName</span>() <span class="pl-c">/*-{ return this.Name; }-*/</span>;
+  <span class="pl-s">public</span> <span class="pl-s">final</span> <span class="pl-s">native</span> <span class="pl-stj">String</span> <span class="pl-en">getLicense</span>() <span class="pl-c">/*-{ return this.License; }-*/</span>;
+  <span class="pl-s">public</span> <span class="pl-s">final</span> <span class="pl-s">native</span> <span class="pl-st">JsArray&lt;<span class="pl-stj">OpenSourceProject</span>.</span><span class="pl-stj">Committer</span>&gt; <span class="pl-en">getCommitters</span>() <span class="pl-c">/*-{ return this.Committers; }-*/</span>;
+}</pre></div>
+        </section>
+
+        <footer>
+          Auto-GWT is maintained by <a href="https://github.com/xtext-dev">xtext-dev</a><br>
+          This page was generated by <a href="http://pages.github.com">GitHub Pages</a>. Tactile theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.
+        </footer>
+
+                  <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-2429174-7");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+      </div>
+    </div>
+  </body>
+</html>
