@@ -8,13 +8,13 @@ See the website for more info : http://www.auto-gwt.org
 Getting Started
 ===============
 
-Auto-GWT is built with Maven, so simply clone the repository and run `mvn clean install` in the rrot directory.
+Auto-GWT is built with Maven, so simply clone the repository and run `mvn clean install` in the root directory.
 
 Example
 =======
 
 Checkout https://github.com/DJCordhose/todomvc-xtend-gwt to see how Auto-GWT is used in GWT project.
-Note that, although this example is completely written in Xtend it is not reuired, you can mix and match Xtend and Java as you wish.
+Note that, although this example is completely written in Xtend it is not required, you can mix and match Xtend and Java as you wish.
 
 IDE
 ===
