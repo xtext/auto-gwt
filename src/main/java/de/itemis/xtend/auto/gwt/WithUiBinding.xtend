@@ -15,6 +15,11 @@ import org.eclipse.xtend.lib.macro.declaration.ClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.Visibility
 
+
+/**
+ * Automatically generates local fields declared in XML view files.
+ * The class name has to match the XML file name.
+ */
 @Target(ElementType.TYPE)
 @Active(WithUiBindingProcessor)
 annotation WithUiBinding {

@@ -21,6 +21,19 @@ import org.eclipse.xtend.lib.macro.declaration.Visibility
 
 import static extension de.itemis.xtend.auto.gwt.StaticUtils.*
 
+/**
+ * Allows to implement a GWT OverlayType using a JSON example.
+ * 
+ * <pre>
+ *  @OverlayTypeByExample('
+ * 		// paste in example JSON data
+ * 		{
+ * 			"name" : "Hans"
+ *      }
+ *  ')
+ *  class Person {}
+ * </pre>
+ */
 @Active(OverlayTypeByExampleProcessor)
 annotation OverlayTypeByExample {
 	String value

@@ -13,9 +13,16 @@ import org.eclipse.xtend.lib.macro.TransformationContext
 import org.eclipse.xtend.lib.macro.declaration.ClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.Visibility
+import java.lang.annotation.Retention
 
+
+/**
+ * Derives the server side and client side interfaces needed for GWT RPC.
+ * Implements the server side interface.
+ */
 @Target(ElementType.TYPE)
 @Active(GwtServiceProcessor)
+@Retention(SOURCE)
 annotation GwtService {
 }
 

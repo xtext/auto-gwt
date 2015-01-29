@@ -9,6 +9,17 @@ import org.eclipse.xtend.lib.macro.declaration.MutableMethodDeclaration
 import org.eclipse.xtend.lib.macro.declaration.TypeDeclaration
 import org.eclipse.xtend.lib.macro.file.Path
 
+/**
+ * JSNI requires comments containing Java script code, which is not translated by the Xtend compiler.
+ * Instead use JsNative:
+ * Example usage
+ * <pre>
+ *   @JsNative def String getFoo(String bar) '''
+ * 		//javascript code goes here
+ *      return bar;
+ *   '''
+ * </pre>
+ */
 @Active(JsNativeProcessor)
 annotation JsNative {
 }
