@@ -32,7 +32,7 @@
           <h1>
 <a id="auto-gwt" class="anchor" href="#auto-gwt" aria-hidden="true"><span class="octicon octicon-link"></span></a>Auto-GWT</h1>
 
-<p>Auto-GWT is a library for GWT that eleminates all superfluous boilerplate from typical GWT idioms and boosts the tool integration to a new level. It's a library for Xtend (<a href="http://www.xtendlang.org">http://www.xtendlang.org</a>), which is a dense, thin but powerful language over Java. It translates to readable Java source code.</p>
+<p>Auto-GWT is a library for GWT that eleminates all superfluous boilerplate from typical GWT idioms and boosts the tool integration to a new level. It's a library for Xtend (<a href="http://xtend-lang.org">http://xtend-lang.org</a>), which is a dense, thin but powerful language for the JVM. It translates to readable Java source code.</p>
 
 Screencast showing Auto-GWT in action:
 <iframe src="//player.vimeo.com/video/118124940" width="500" height="281" frameborder="0" webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe> <p><a href="http://vimeo.com/118124940">Auto-GWT</a> from <a href="http://vimeo.com/user2817486">Xtext Team</a> on <a href="https://vimeo.com">Vimeo</a>.</p>
@@ -45,14 +45,14 @@ Slides from the talk at GWT.create:
 <h1>
 <a id="what-auto-gwt-does-specifically" class="anchor" href="#what-auto-gwt-does-specifically" aria-hidden="true"><span class="octicon octicon-link"></span></a>What Auto-GWT does specifically</h1>
 
-<p>Here are some example of what GWT does for you.</p>
+<p>Here are some examples of what Auto-GWT does for you.</p>
 
 <h1>
 <a id="basic-things-first" class="anchor" href="#basic-things-first" aria-hidden="true"><span class="octicon octicon-link"></span></a>Basic things first</h1>
 
-<p>Xtend in general removes the boilerplate from your Java code base just by using it. Here's just one example of how your typical GWT code could be improved by using Xtend.</p>
+<p>Xtend in general removes the boilerplate from your Java codebase just by using it. Here's just one example of how your typical GWT code could be improved by using Xtend.</p>
 
-<p>Adding a ClickHandler that removes any completed todos.</p>
+<p>Adding a ClickHandler that removes any completed ToDos.</p>
 
 <p>Java:</p>
 
@@ -75,13 +75,13 @@ Slides from the talk at GWT.create:
   todos <span class="pl-k">=</span> todos<span class="pl-k">.</span>filter[<span class="pl-k">!</span>done]<span class="pl-k">.</span>toList
 ]</pre></div>
 
-<p>Not only much shorter but also much more readable. You glimpse at the code and it is clear what it does.
+<p>Xtend is not only much shorter but also much more readable. You glimpse at the code and it is clear what it does.
 And this was only pure Xtend without Auto-GWT. Let's see what Auto-GWT can do.</p>
 
 <h1>
 <a id="automated-uibinder" class="anchor" href="#automated-uibinder" aria-hidden="true"><span class="octicon octicon-link"></span></a>Automated UIBinder</h1>
 
-<p>UiBinder in GWT are a way to bind elements from an XML (html) file to Java code. You give certain elements in the XML a name using the <em>ui::field</em> attribute and then need to redeclare the with the same name and the correct type in your Java class in order to access the programmatically, e.g. to add handlers.</p>
+<p>UiBinder in GWT are a way to bind elements from an XML (html) file to Java code. You give certain elements in the XML a name using the <em>ui:field</em> attribute and then need to redeclare it with the same name and the correct type in your Java class in order to access the widget programmatically, e.g. to add handlers.</p>
 
 <p>The Auto-GWT <em>@WithUiBinding</em> active annotation does that plumbing for you. You simply annotate your class with the annotation and it will during compilation look up the XML, declare the respective fields automatically and does the rest of the boilerplate for you. </p>
 
@@ -191,12 +191,12 @@ With Auto-GWT you can do much better:</p>
 
 }</pre></div>
 
-<p>and Auto-GWT will derive the whole pattern needed by GWT from that. Again the big benefit is not only less code to type, read and maintain, but that the IDE and the compiler are fully aware of the expansion. Just try doing a CallHierarchy in Eclipse on a client side call of an async service method. It will go seemlessly to the server side code.</p>
+<p>Auto-GWT will derive the whole pattern needed by GWT from that. Again the big benefit is not only less code to type, read and maintain: The IDE and the compiler are fully aware of the expansion. Just try doing a CallHierarchy in Eclipse on a client side call of an async service method. It will go seemlessly to the server side code.</p>
 
 <h1>
 <a id="overlaytypes---working-with-json" class="anchor" href="#overlaytypes---working-with-json" aria-hidden="true"><span class="octicon octicon-link"></span></a>OverlayTypes - Working with JSON</h1>
 
-<p>Imagine you want to call some arbitrary REST service that responses with JSON data. Usually there is a decsription on that website, sporting an example of the JSON data. But how do you access it from within client side GWT? OverlayTypes are a good solution as they are just thin facades over the real javascript objects. But writing them by hand and for a given example JSON tree is tedious and error prone. With Auto-GWT you can use <em>@OverlayTypeByExample</em> and just past the JSON data as an annotation value. The compiler will create proper GWT OverlayTypes from that. It will even create nested types for nested data structures.</p>
+<p>Imagine you want to call some arbitrary REST service that responses with JSON data. Usually there is a description on that website, sporting an example of the JSON data. But how do you access it from within client side GWT? OverlayTypes are a good solution as they are just thin facades over the real javascript objects. But writing them by hand and for a given example JSON tree is tedious and error prone. With Auto-GWT you can use <em>@OverlayTypeByExample</em> and just pass the JSON data as an annotation value. The compiler will create proper GWT OverlayTypes from that. It will even create nested types for nested data structures.</p>
 
 <p>Here's an example:</p>
 
@@ -216,7 +216,7 @@ With Auto-GWT you can do much better:</p>
 <span class="pl-s1"><span class="pl-pds">'</span></span>)
 <span class="pl-s">class</span> <span class="pl-en">OpenSourceProject</span> {}</pre></div>
 
-<p>The <em>@OverlayTypeByExample</em> will create teh following Java code from that:</p>
+<p>The <em>@OverlayTypeByExample</em> will create the following Java code from that:</p>
 
 <p>Generated Java:</p>
 
