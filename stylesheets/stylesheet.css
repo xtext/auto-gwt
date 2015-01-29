@@ -388,7 +388,7 @@ footer a:hover {
 }
 
 .pl-s1 .pl-s2, .pl-smi, .pl-smp, .pl-stj, .pl-vo, .pl-vpf {
-    color: #333
+    color: #999999
 }
 
 .pl-ent {
@@ -396,7 +396,7 @@ footer a:hover {
 }
 
 .pl-k, .pl-s, .pl-st {
-    color: #a71d5d
+    color: #ec2983
 }
 
 .pl-pds, .pl-s1, .pl-s1 .pl-pse .pl-s2, .pl-sr, .pl-sr .pl-cce, .pl-sr .pl-sra,
