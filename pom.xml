@@ -13,7 +13,7 @@
 	<properties>
 		<gwt.version>2.7.0</gwt.version>
 		<guava.version>18.0</guava.version>
-		<xtend.version>2.8.0-SNAPSHOT</xtend.version>
+		<xtend.version>2.9.0-SNAPSHOT</xtend.version>
 	</properties>
 
 	<dependencyManagement>
