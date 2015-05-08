@@ -12,6 +12,7 @@ import com.google.gwt.user.client.rpc.RemoteService
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath
 import com.google.gwt.user.server.rpc.RemoteServiceServlet
 import java.lang.annotation.ElementType
+import java.lang.annotation.Retention
 import java.lang.annotation.Target
 import org.eclipse.xtend.lib.macro.AbstractClassProcessor
 import org.eclipse.xtend.lib.macro.Active
@@ -20,8 +21,6 @@ import org.eclipse.xtend.lib.macro.TransformationContext
 import org.eclipse.xtend.lib.macro.declaration.ClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.Visibility
-import java.lang.annotation.Retention
-
 
 /**
  * Derives the server side and client side interfaces needed for GWT RPC.
@@ -31,6 +30,7 @@ import java.lang.annotation.Retention
 @Active(GwtServiceProcessor)
 @Retention(SOURCE)
 annotation GwtService {
+	String remoteServiceRelativePath = ''
 }
 
 class GwtServiceProcessor extends AbstractClassProcessor {
@@ -58,20 +58,21 @@ class GwtServiceProcessor extends AbstractClassProcessor {
 		if (extendedClass != Object.newTypeReference) {
 			addError("A service must not extend another class.")
 		}
-
+		
 		val interfaceType = findInterface(interfaceName)
 		interfaceType.primarySourceElement = primarySourceElement
 		val interfaceAsyncType = findInterface(interfaceAsyncName)
 		interfaceAsyncType.primarySourceElement = primarySourceElement
 
 		interfaceType.extendedInterfaces = interfaceType.extendedInterfaces + #[RemoteService.newTypeReference]
-		val name = interfaceSimpleName.toFirstLower
+
+		val name = getRemoteServiceRelativePath(it, context)
 		interfaceType.addAnnotation(
 			RemoteServiceRelativePath.newAnnotationReference [
 				set('value', name)
 			]
 		)
-
+		
 		for (method : declaredMethods.filter[visibility == Visibility::PUBLIC]) {
 			interfaceType.addMethod(method.simpleName) [
 				returnType = method.returnType
@@ -90,6 +91,15 @@ class GwtServiceProcessor extends AbstractClassProcessor {
 
 		extendedClass = RemoteServiceServlet.newTypeReference
 		implementedInterfaces = implementedInterfaces + #[interfaceType.newTypeReference]
+	}
+	
+	def getRemoteServiceRelativePath(MutableClassDeclaration it, extension TransformationContext context) {
+		val gwtServiceAnnotation = findAnnotation(GwtService.findTypeGlobally)
+		val remoteServiceRelativePath = gwtServiceAnnotation.getValue('remoteServiceRelativePath') as String
+		if (remoteServiceRelativePath.nullOrEmpty) {
+		 	return interfaceSimpleName.toFirstLower
+		}
+		return remoteServiceRelativePath
 	}
 
 	def static interfaceAsyncName(ClassDeclaration it) {
