@@ -67,6 +67,18 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>org.eclipse.xtext</groupId>
+			<artifactId>org.eclipse.xtext.xbase.junit</artifactId>
+			<version>${xtend.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.xtext</groupId>
+			<artifactId>org.eclipse.xtext.junit4</artifactId>
+			<version>${xtend.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
@@ -115,7 +127,7 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
 	<pluginRepositories>
 		<pluginRepository>
 			<id>Sonatype Snapshots</id>
@@ -128,7 +140,7 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
-	
+
 	<repositories>
 		<repository>
 			<id>Sonatype Snapshots</id>
