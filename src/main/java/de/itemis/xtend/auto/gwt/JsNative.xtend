@@ -15,6 +15,7 @@ import org.eclipse.xtend.lib.macro.declaration.MethodDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableMethodDeclaration
 import org.eclipse.xtend.lib.macro.declaration.TypeDeclaration
 import org.eclipse.xtend.lib.macro.file.Path
+import java.util.List
 
 /**
  * JSNI requires comments containing Java script code, which is not translated by the Xtend compiler.
@@ -51,14 +52,22 @@ class JsNativeProcessor extends AbstractMethodProcessor {
 		return method.declaringType.simpleName+"#"+method.simpleName+"("+method.parameters.map[type].join(',')+")"
 	}
 		
-	override doGenerateCode(MethodDeclaration annotatedMethod, extension CodeGenerationContext context) {
-		val path = annotatedMethod.declaringType.getTargetPath(context)
-		val contents = path.contents.toString
-		val markerStart = contents.indexOf(getUniqueMarkerCode(annotatedMethod))
-		val startIndex = contents.substring(0, markerStart).lastIndexOf('{')
-		val endIndex = contents.substring(markerStart).indexOf('}') + markerStart
-		val jsCode = annotatedMethod.body.toString.trimTripleQuotes
-		path.contents = contents.substring(0, startIndex)+"/*-{"+jsCode+"}-*/;"+contents.substring(endIndex+1)
+	override doGenerateCode(List<? extends MethodDeclaration> annotatedMethods, extension CodeGenerationContext context) {
+		val path = annotatedMethods.findFirst[true].declaringType.getTargetPath(context)
+		var contents = path.contents.toString
+		
+		for(annotatedMethod: annotatedMethods) {
+			val markerStart = contents.indexOf(getUniqueMarkerCode(annotatedMethod))
+			val startIndex = contents.substring(0, markerStart).lastIndexOf('{')
+			val endIndex = contents.substring(markerStart).indexOf('}') + markerStart
+			val jsCode = annotatedMethod.body.toString.trimTripleQuotes
+			contents = contents.substring(0, startIndex)+"/*-{"+jsCode+"}-*/;"+contents.substring(endIndex+1)
+		}
+		
+		path.contents = contents
+		do {
+			Thread.sleep(100)
+		} while (path.contents.toString != contents)
 	}
 	
 	private def String trimTripleQuotes(String s) {
@@ -68,6 +77,6 @@ class JsNativeProcessor extends AbstractMethodProcessor {
 	def Path getTargetPath(TypeDeclaration type, extension CodeGenerationContext ctx) {
 		val unit = type.compilationUnit
 		val targetFolder = unit.filePath.targetFolder
-		return targetFolder.append(type.qualifiedName.replace('.','/')+".java")
+		return targetFolder.append(unit.sourceTypeDeclarations.findFirst[true].qualifiedName.replace('.','/')+".java")
 	}
 }
