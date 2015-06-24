@@ -20,6 +20,8 @@ import java.lang.annotation.ElementType
 import java.lang.annotation.Target
 import java.util.List
 import org.eclipse.xtend.lib.macro.Active
+import org.eclipse.xtend.lib.macro.CodeGenerationContext
+import org.eclipse.xtend.lib.macro.CodeGenerationParticipant
 import org.eclipse.xtend.lib.macro.RegisterGlobalsContext
 import org.eclipse.xtend.lib.macro.RegisterGlobalsParticipant
 import org.eclipse.xtend.lib.macro.TransformationContext
@@ -30,8 +32,6 @@ import org.eclipse.xtend.lib.macro.declaration.MutableAnnotationTarget
 import org.eclipse.xtend.lib.macro.declaration.MutableInterfaceDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableMethodDeclaration
 import org.eclipse.xtend.lib.macro.declaration.TypeDeclaration
-import org.eclipse.xtend.lib.macro.CodeGenerationParticipant
-import org.eclipse.xtend.lib.macro.CodeGenerationContext
 import org.eclipse.xtend.lib.macro.file.Path
 
 @Target(ElementType.TYPE)
@@ -252,9 +252,11 @@ class CliendBundleProcessor implements RegisterGlobalsParticipant<InterfaceDecla
 	}
 	
 	override doGenerateCode(List<? extends InterfaceDeclaration> annotatedSourceElements, extension CodeGenerationContext context) {
-		val path = annotatedSourceElements.get(0).declaringType.getTargetPath(context)
-		val contents = path.contents.toString.replaceAll("@ClientBundle.Source", "@Source")
-		path.contents = contents
+		for(annotatedSourceElement: annotatedSourceElements) {
+			val path = annotatedSourceElement.declaringType.getTargetPath(context)
+			val newContents = path.contents.toString.replaceAll("@ClientBundle.Source", "@Source")
+			path.contents = newContents
+		} 
 	}
 
 	private def Path getTargetPath(TypeDeclaration type, extension CodeGenerationContext ctx) {

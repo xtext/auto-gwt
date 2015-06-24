@@ -14,6 +14,9 @@ import com.google.gson.JsonParser
 import com.google.gson.JsonPrimitive
 import com.google.gwt.core.client.JavaScriptObject
 import com.google.gwt.core.client.JsArray
+import com.google.gwt.core.client.JsArrayBoolean
+import com.google.gwt.core.client.JsArrayNumber
+import com.google.gwt.core.client.JsArrayString
 import java.util.Map.Entry
 import java.util.regex.Pattern
 import org.eclipse.xtend.lib.macro.AbstractClassProcessor
@@ -27,9 +30,6 @@ import org.eclipse.xtend.lib.macro.declaration.TypeReference
 import org.eclipse.xtend.lib.macro.declaration.Visibility
 
 import static extension de.itemis.xtend.auto.gwt.StaticUtils.*
-import com.google.gwt.core.client.JsArrayString
-import com.google.gwt.core.client.JsArrayBoolean
-import com.google.gwt.core.client.JsArrayNumber
 
 /**
  * Allows to implement a GWT OverlayType using a JSON example.
@@ -95,10 +95,11 @@ class OverlayTypeByExampleProcessor extends AbstractClassProcessor {
 	 */
 	override doGenerateCode(ClassDeclaration annotatedClass, extension CodeGenerationContext context) {
 		val targetFolder = annotatedClass.compilationUnit.filePath.targetFolder
-		val targetFile = targetFolder.append(annotatedClass.qualifiedName.replace('.','/')+".java")
-		val contents = targetFile.contents
+		val path = targetFolder.append(annotatedClass.qualifiedName.replace('.','/')+".java")
+		val contents = path.contents
 		val matcher = PATTERN.matcher(contents)
-		targetFile.contents = matcher.replaceAll("public final native $1 get$2() /*-{ return this.$3; }-*/;")
+		val newContents = matcher.replaceAll("public final native $1 get$2() /*-{ return this.$3; }-*/;")
+		path.contents = newContents
 	}
 
 	static class Util {
