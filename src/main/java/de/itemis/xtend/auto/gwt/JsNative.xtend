@@ -76,6 +76,6 @@ class JsNativeProcessor extends AbstractMethodProcessor {
 	def Path getTargetPath(TypeDeclaration type, extension CodeGenerationContext ctx) {
 		val unit = type.compilationUnit
 		val targetFolder = unit.filePath.targetFolder
-		return targetFolder.append(type.qualifiedName.replace('.','/')+".java")
+		return targetFolder.append(unit.sourceTypeDeclarations.findFirst[true].qualifiedName.replace('.','/')+".java")
 	}
 }
