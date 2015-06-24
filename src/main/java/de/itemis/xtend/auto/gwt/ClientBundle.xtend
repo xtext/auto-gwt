@@ -30,6 +30,9 @@ import org.eclipse.xtend.lib.macro.declaration.MutableAnnotationTarget
 import org.eclipse.xtend.lib.macro.declaration.MutableInterfaceDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableMethodDeclaration
 import org.eclipse.xtend.lib.macro.declaration.TypeDeclaration
+import org.eclipse.xtend.lib.macro.CodeGenerationParticipant
+import org.eclipse.xtend.lib.macro.CodeGenerationContext
+import org.eclipse.xtend.lib.macro.file.Path
 
 @Target(ElementType.TYPE)
 annotation CssResource {
@@ -47,7 +50,8 @@ annotation ImageResources {
 annotation ClientBundle {
 }
 
-class CliendBundleProcessor implements RegisterGlobalsParticipant<InterfaceDeclaration>, TransformationParticipant<MutableInterfaceDeclaration> {
+class CliendBundleProcessor implements RegisterGlobalsParticipant<InterfaceDeclaration>, TransformationParticipant<MutableInterfaceDeclaration>, 
+		CodeGenerationParticipant<InterfaceDeclaration> {
 
 	private static final String INSTANCE = 'INSTANCE'
 
@@ -246,5 +250,16 @@ class CliendBundleProcessor implements RegisterGlobalsParticipant<InterfaceDecla
 	protected def getCssResources(MutableInterfaceDeclaration it) {
 		annotations.filter[annotationTypeDeclaration.qualifiedName == CssResource.name]
 	}
+	
+	override doGenerateCode(List<? extends InterfaceDeclaration> annotatedSourceElements, extension CodeGenerationContext context) {
+		val path = annotatedSourceElements.get(0).declaringType.getTargetPath(context)
+		val contents = path.contents.toString.replaceAll("@ClientBundle.Source", "@Source")
+		path.contents = contents
+	}
 
+	private def Path getTargetPath(TypeDeclaration type, extension CodeGenerationContext ctx) {
+		val unit = type.compilationUnit
+		val targetFolder = unit.filePath.targetFolder
+		return targetFolder.append(unit.sourceTypeDeclarations.findFirst[true].qualifiedName.replace('.','/')+".java")
+	}
 }
