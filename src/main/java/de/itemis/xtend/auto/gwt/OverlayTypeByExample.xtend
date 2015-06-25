@@ -26,8 +26,10 @@ import org.eclipse.xtend.lib.macro.RegisterGlobalsContext
 import org.eclipse.xtend.lib.macro.TransformationContext
 import org.eclipse.xtend.lib.macro.declaration.ClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
+import org.eclipse.xtend.lib.macro.declaration.TypeDeclaration
 import org.eclipse.xtend.lib.macro.declaration.TypeReference
 import org.eclipse.xtend.lib.macro.declaration.Visibility
+import org.eclipse.xtend.lib.macro.file.Path
 
 import static extension de.itemis.xtend.auto.gwt.StaticUtils.*
 
@@ -94,8 +96,7 @@ class OverlayTypeByExampleProcessor extends AbstractClassProcessor {
 	 * we add the Java comment containing the javascript code during code generation, since there is no way to add it using the Java model.
 	 */
 	override doGenerateCode(ClassDeclaration annotatedClass, extension CodeGenerationContext context) {
-		val targetFolder = annotatedClass.compilationUnit.filePath.targetFolder
-		val path = targetFolder.append(annotatedClass.qualifiedName.replace('.','/')+".java")
+		val path = ActiveAnnotationProcessorHelper::getTargetPath(annotatedClass, context)
 		val contents = path.contents
 		val matcher = PATTERN.matcher(contents)
 		val newContents = matcher.replaceAll("public final native $1 get$2() /*-{ return this.$3; }-*/;")

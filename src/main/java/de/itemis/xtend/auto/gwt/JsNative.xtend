@@ -61,7 +61,7 @@ class JsNativeProcessor extends AbstractMethodProcessor {
 		// We load change all contents first and later save all compilation units only once.
 		val javaUnits = new HashMap<Path, String>;
 		for(annotatedMethod: annotatedMethods) {
-			val path = annotatedMethod.declaringType.getTargetPath(context)
+			val path = ActiveAnnotationProcessorHelper::getTargetPath(annotatedMethod.declaringType, context)
 			if (javaUnits.get(path) == null) {
 				javaUnits.put(path, path.contents.toString)	
 			}
@@ -84,16 +84,5 @@ class JsNativeProcessor extends AbstractMethodProcessor {
 	
 	private def String trimTripleQuotes(String s) {
 		s.substring(3, s.length-3)
-	}
-	
-	private def TypeDeclaration topLevelType(TypeDeclaration type) {
-		return if (type.declaringType == null) type else type.declaringType.topLevelType
-	}
-	
-	private def Path getTargetPath(TypeDeclaration type, extension CodeGenerationContext ctx) {		
-		val topLevelType = type.topLevelType
-		val unit = type.compilationUnit
-		val targetFolder = unit.filePath.targetFolder
-		return targetFolder.append(unit.sourceTypeDeclarations.findFirst[sourceType|sourceType==topLevelType].qualifiedName.replace('.','/')+".java")
 	}
 }
