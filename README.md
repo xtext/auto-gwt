@@ -1,5 +1,6 @@
 Auto-GWT
 ========
+[![Build Status](https://travis-ci.org/xtext/auto-gwt.svg)](https://travis-ci.org/xtext/auto-gwt)
 
 Auto-GWT is a library for GWT that eleminates all superfluous boilerplate from typical GWT idioms and boosts the tool integration to a new level. It's a library for Xtend (http://www.xtend-lang.org/), which is a dense, thin but powerful language over Java. It translates to readable Java source code.
 
