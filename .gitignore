@@ -1,6 +1,17 @@
-.DS_Store
-target
-xtend-gen
+# Eclipse
 .classpath
 .project
-.settings
+.settings/
+.metadata/
+bin/
+
+# IntelliJ
+*.iml
+*.ipr
+*.iws
+.idea/
+out/
+
+# Gradle
+.gradle/
+build/
