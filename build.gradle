@@ -37,3 +37,5 @@ targetCompatibility = 1.6
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
+
+javadoc.options.addStringOption("sourcepath", sourceSets.main.allJava.asPath)
