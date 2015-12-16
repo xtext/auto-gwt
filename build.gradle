@@ -6,9 +6,8 @@ plugins {
 
 group = 'org.xtend'
 description = "AutoGWT"
-//TODO use xtext.team accounts
-bintray.user = "oehme"
-bintray.pkg.version.mavenCentralSync.user = "oehme"
+bintray.user = "xtext-team"
+bintray.pkg.version.mavenCentralSync.user = "xtext.team"
 
 contacts {
   "xtext.team@gmail.com" {
