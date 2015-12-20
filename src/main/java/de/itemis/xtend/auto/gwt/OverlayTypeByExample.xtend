@@ -14,6 +14,9 @@ import com.google.gson.JsonParser
 import com.google.gson.JsonPrimitive
 import com.google.gwt.core.client.JavaScriptObject
 import com.google.gwt.core.client.JsArray
+import com.google.gwt.core.client.JsArrayBoolean
+import com.google.gwt.core.client.JsArrayNumber
+import com.google.gwt.core.client.JsArrayString
 import java.util.Map.Entry
 import java.util.regex.Pattern
 import org.eclipse.xtend.lib.macro.AbstractClassProcessor
@@ -23,8 +26,10 @@ import org.eclipse.xtend.lib.macro.RegisterGlobalsContext
 import org.eclipse.xtend.lib.macro.TransformationContext
 import org.eclipse.xtend.lib.macro.declaration.ClassDeclaration
 import org.eclipse.xtend.lib.macro.declaration.MutableClassDeclaration
+import org.eclipse.xtend.lib.macro.declaration.TypeDeclaration
 import org.eclipse.xtend.lib.macro.declaration.TypeReference
 import org.eclipse.xtend.lib.macro.declaration.Visibility
+import org.eclipse.xtend.lib.macro.file.Path
 
 import static extension de.itemis.xtend.auto.gwt.StaticUtils.*
 
@@ -85,19 +90,18 @@ class OverlayTypeByExampleProcessor extends AbstractClassProcessor {
 	}
 	
 	
-	val PATTERN = Pattern.compile("public final native (.+) get(\\w+)\\(\\);")
+	val PATTERN = Pattern.compile("public final native (.+) get(\\w+)\\(\\) \\{\\s*(\\w+)\\s*\\}")
 	
 	/**
 	 * we add the Java comment containing the javascript code during code generation, since there is no way to add it using the Java model.
 	 */
 	override doGenerateCode(ClassDeclaration annotatedClass, extension CodeGenerationContext context) {
-		val targetFolder = annotatedClass.compilationUnit.filePath.targetFolder
-		val targetFile = targetFolder.append(annotatedClass.qualifiedName.replace('.','/')+".java")
-		val contents = targetFile.contents
+		val path = ActiveAnnotationProcessorHelper::getTargetPath(annotatedClass, context)
+		val contents = path.contents
 		val matcher = PATTERN.matcher(contents)
-		targetFile.contents = matcher.replaceAll("public final native $1 get$2() /*-{ return this.$2; }-*/;")
+		val newContents = matcher.replaceAll("public final native $1 get$2() /*-{ return this.$3; }-*/;")
+		path.contents = newContents
 	}
-
 
 	static class Util {
 		extension TransformationContext ctx
@@ -122,6 +126,8 @@ class OverlayTypeByExampleProcessor extends AbstractClassProcessor {
 						native = true
 						final = true
 						returnType = getJavaType(property, classDeclaration)
+						// save the property key as body for later reference in code generation phase
+						body = '''«property.key»'''
 					]
 				}
 				
@@ -147,19 +153,26 @@ class OverlayTypeByExampleProcessor extends AbstractClassProcessor {
 					val type = currentContainer.declaredClasses.findFirst[simpleName == simpleTypeName]
 					type.newTypeReference
 				}
-				JsonPrimitive case element.isString: {
-					String.newTypeReference
-				}
-				JsonPrimitive case element.isBoolean: {
-					boolean.newTypeReference
-				}
-				JsonPrimitive case element.isNumber: {
-					if (element.asString.indexOf('.') == -1) {
-						int.newTypeReference
+				JsonPrimitive:
+					if (isArray) {
+						switch (element) {
+							case element.isString: return JsArrayString.newTypeReference
+							case element.isBoolean: return JsArrayBoolean.newTypeReference
+							case element.isNumber: return JsArrayNumber.newTypeReference
+						}
 					} else {
-						double.newTypeReference
-					}
-				}
+						switch (element) {
+							case element.isString: String.newTypeReference
+							case element.isBoolean: boolean.newTypeReference
+							case element.isNumber: {
+								if (element.asString.indexOf('.') == -1) {
+									int.newTypeReference
+								} else {
+									double.newTypeReference
+								}
+							}
+						}	
+					}				
 				default : {
 	 				currentContainer.addError("unknown element "+element)
 					throw new IllegalStateException

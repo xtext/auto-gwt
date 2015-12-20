@@ -20,6 +20,8 @@ import java.lang.annotation.ElementType
 import java.lang.annotation.Target
 import java.util.List
 import org.eclipse.xtend.lib.macro.Active
+import org.eclipse.xtend.lib.macro.CodeGenerationContext
+import org.eclipse.xtend.lib.macro.CodeGenerationParticipant
 import org.eclipse.xtend.lib.macro.RegisterGlobalsContext
 import org.eclipse.xtend.lib.macro.RegisterGlobalsParticipant
 import org.eclipse.xtend.lib.macro.TransformationContext
@@ -47,7 +49,8 @@ annotation ImageResources {
 annotation ClientBundle {
 }
 
-class CliendBundleProcessor implements RegisterGlobalsParticipant<InterfaceDeclaration>, TransformationParticipant<MutableInterfaceDeclaration> {
+class CliendBundleProcessor implements RegisterGlobalsParticipant<InterfaceDeclaration>, TransformationParticipant<MutableInterfaceDeclaration>, 
+		CodeGenerationParticipant<InterfaceDeclaration> {
 
 	private static final String INSTANCE = 'INSTANCE'
 
@@ -246,5 +249,12 @@ class CliendBundleProcessor implements RegisterGlobalsParticipant<InterfaceDecla
 	protected def getCssResources(MutableInterfaceDeclaration it) {
 		annotations.filter[annotationTypeDeclaration.qualifiedName == CssResource.name]
 	}
-
+	
+	override doGenerateCode(List<? extends InterfaceDeclaration> annotatedSourceElements, extension CodeGenerationContext context) {
+		for(annotatedSourceElement: annotatedSourceElements) {
+			val path = ActiveAnnotationProcessorHelper::getTargetPath(annotatedSourceElement, context)
+			val newContents = path.contents.toString.replaceAll("@ClientBundle.Source", "@Source")
+			path.contents = newContents
+		} 
+	}
 }
